@@ -10,7 +10,12 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { Public } from '../decorators/public.decorator';
-import { AuthResponseDTO, CreateUserDTO, ErrorResponseDTO, SignInDTO } from '../types';
+import {
+  AuthResponseDTO,
+  CreateUserDTO,
+  ErrorResponseDTO,
+  SignInDTO,
+} from '../types';
 
 @ApiTags('Auth')
 @Controller('auth')
