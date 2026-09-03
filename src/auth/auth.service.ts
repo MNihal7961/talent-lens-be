@@ -21,7 +21,7 @@ export class AuthService {
       createUserDto.email,
     );
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw new ConflictException('User already registered, please login');
     }
 
     const user = await this.userService.createUser(createUserDto);
@@ -31,7 +31,7 @@ export class AuthService {
   async signIn(signInDto: SignInDTO) {
     const user = await this.userService.getUserByEmail(signInDto.email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('User not found');
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -39,7 +39,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Wrong password');
     }
 
     return this.buildAuthResponse(user);
