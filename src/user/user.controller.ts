@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, NotFoundException } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -26,7 +27,15 @@ export class UserController {
     description: 'Missing or invalid access token',
     type: ErrorResponseDTO,
   })
-  getCurrentUser(@CurrentUser() user: JwtPayload) {
-    return this.userService.getUserById(user._id);
+  @ApiNotFoundResponse({
+    description: 'User no longer exists',
+    type: ErrorResponseDTO,
+  })
+  async getCurrentUser(@CurrentUser() user: JwtPayload) {
+    const currentUser = await this.userService.getUserById(user._id);
+    if (!currentUser) {
+      throw new NotFoundException('User not found');
+    }
+    return currentUser;
   }
 }
