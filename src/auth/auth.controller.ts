@@ -29,7 +29,7 @@ export class AuthController {
     type: ErrorResponseDTO,
   })
   @ApiConflictResponse({
-    description: 'A user with this email already exists',
+    description: 'User already registered, please login',
     type: ErrorResponseDTO,
   })
   signUp(@Body() createUserDto: CreateUserDTO) {
@@ -49,7 +49,7 @@ export class AuthController {
     type: ErrorResponseDTO,
   })
   @ApiUnauthorizedResponse({
-    description: 'Invalid credentials',
+    description: 'User not found, or password is incorrect',
     type: ErrorResponseDTO,
   })
   signIn(@Body() signInDto: SignInDTO) {
