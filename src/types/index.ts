@@ -11,7 +11,10 @@ export class CreateUserDTO {
   @IsString()
   lastName!: string;
 
-  @ApiProperty({ example: 'john.doe@example.com', description: 'User email address' })
+  @ApiProperty({
+    example: 'john.doe@example.com',
+    description: 'User email address',
+  })
   @IsEmail()
   email!: string;
 
@@ -26,7 +29,10 @@ export class CreateUserDTO {
 }
 
 export class SignInDTO {
-  @ApiProperty({ example: 'john.doe@example.com', description: 'User email address' })
+  @ApiProperty({
+    example: 'john.doe@example.com',
+    description: 'User email address',
+  })
   @IsEmail()
   email!: string;
 
@@ -76,11 +82,8 @@ export class ErrorResponseDTO {
   @ApiProperty({
     description:
       'Error message. A single string for most errors, an array of strings for validation errors.',
-    oneOf: [
-      { type: 'string' },
-      { type: 'array', items: { type: 'string' } },
-    ],
-    example: 'Invalid credentials',
+    oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }],
+    example: 'Wrong password',
   })
   message!: string | string[];
 
