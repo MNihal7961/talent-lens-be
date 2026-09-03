@@ -56,6 +56,8 @@ export class AuthService {
         lastName: user.lastName,
         email: user.email,
         role: user.role,
+        createdAt: user.get('createdAt') as Date,
+        updatedAt: user.get('updatedAt') as Date,
       },
     };
   }
