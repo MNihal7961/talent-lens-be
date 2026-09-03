@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { User, UserDocument } from './user.model';
 import { CreateUserDTO } from '../types';
 
 const SALT_ROUNDS = 10;
+const DUPLICATE_KEY_ERROR_CODE = 11000;
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,10 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  getUserById(id: string) {
+  async getUserById(id: string) {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
     return this.userModel.findById(id).select('-password').exec();
   }
 
@@ -26,9 +30,17 @@ export class UserService {
       createUserDto.password,
       SALT_ROUNDS,
     );
-    return this.userModel.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
+
+    try {
+      return await this.userModel.create({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+    } catch (error) {
+      if ((error as { code?: number }).code === DUPLICATE_KEY_ERROR_CODE) {
+        throw new ConflictException('User with this email already exists');
+      }
+      throw error;
+    }
   }
 }
