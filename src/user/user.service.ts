@@ -38,7 +38,7 @@ export class UserService {
       });
     } catch (error) {
       if ((error as { code?: number }).code === DUPLICATE_KEY_ERROR_CODE) {
-        throw new ConflictException('User with this email already exists');
+        throw new ConflictException('User already registered, please login');
       }
       throw error;
     }
