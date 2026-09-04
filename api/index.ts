@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import express, { Request, Response } from 'express';
+import * as express from 'express';
+import type { Request, Response } from 'express';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from '../src/app.module';
