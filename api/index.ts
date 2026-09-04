@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import * as express from 'express';
+import express = require('express');
 import type { Request, Response } from 'express';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
