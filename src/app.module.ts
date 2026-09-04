@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PresenceModule } from './presence/presence.module';
+import { JobPostModule } from './job-post/job-post.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PresenceModule } from './presence/presence.module';
     AuthModule,
     UserModule,
     PresenceModule,
+    JobPostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
