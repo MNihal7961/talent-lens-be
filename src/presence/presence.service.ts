@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- this is the only import form for the `pusher` package's `export =` CJS module that's constructable at runtime across environments (default and namespace imports were both verified broken)
 import Pusher = require('pusher');
 import {
   JoB_APPLICATION_SCREENING_STATUS_UPDATED_EVENT,
