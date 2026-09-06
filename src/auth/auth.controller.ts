@@ -37,8 +37,8 @@ export class AuthController {
     description: 'User already registered, please login',
     type: ErrorResponseDTO,
   })
-  signUp(@Body() createUserDto: CreateUserDTO) {
-    return this.authService.signUp(createUserDto);
+  async signUp(@Body() createUserDto: CreateUserDTO) {
+    return await this.authService.signUp(createUserDto);
   }
 
   @Public()
@@ -57,7 +57,7 @@ export class AuthController {
     description: 'User not found, or password is incorrect',
     type: ErrorResponseDTO,
   })
-  signIn(@Body() signInDto: SignInDTO) {
-    return this.authService.signIn(signInDto);
+  async signIn(@Body() signInDto: SignInDTO) {
+    return await this.authService.signIn(signInDto);
   }
 }
