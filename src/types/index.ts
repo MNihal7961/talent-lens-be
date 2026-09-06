@@ -12,6 +12,19 @@ import {
 } from 'class-validator';
 import { UserRole } from '../user/user.model';
 
+export class PresenceAuthDTO {
+  @ApiProperty({ example: '123.456', description: 'Pusher connection socket id' })
+  @IsString()
+  socket_id!: string;
+
+  @ApiProperty({
+    example: 'presence-online-users',
+    description: 'Name of the presence channel being subscribed to',
+  })
+  @IsString()
+  channel_name!: string;
+}
+
 export class CreateUserDTO {
   @ApiProperty({ example: 'John', description: 'User first name' })
   @IsString()
