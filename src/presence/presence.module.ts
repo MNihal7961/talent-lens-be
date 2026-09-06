@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from '../auth/auth.module';
-import { PresenceGateway } from './presence.gateway';
+import { PresenceController } from './presence.controller';
 import { PresenceService } from './presence.service';
 
 @Module({
-  imports: [AuthModule],
-  providers: [PresenceGateway, PresenceService],
-  exports: [PresenceService],
+  controllers: [PresenceController],
+  providers: [PresenceService],
 })
 export class PresenceModule {}

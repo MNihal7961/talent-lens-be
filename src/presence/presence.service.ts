@@ -1,36 +1,30 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import * as Pusher from 'pusher';
 
 @Injectable()
 export class PresenceService {
-  private readonly onlineUsers = new Map<string, Set<string>>();
+  private readonly pusher: Pusher;
 
-  addConnection(userId: string, socketId: string): boolean {
-    const sockets = this.onlineUsers.get(userId) ?? new Set<string>();
-    const cameOnline = sockets.size === 0;
-    sockets.add(socketId);
-    this.onlineUsers.set(userId, sockets);
-    return cameOnline;
+  constructor(private readonly configService: ConfigService) {
+    this.pusher = new Pusher({
+      appId: this.configService.getOrThrow<string>('PUSHER_APP_ID'),
+      key: this.configService.getOrThrow<string>('PUSHER_KEY'),
+      secret: this.configService.getOrThrow<string>('PUSHER_SECRET'),
+      cluster: this.configService.getOrThrow<string>('PUSHER_CLUSTER'),
+      useTLS: true,
+    });
   }
 
-  removeConnection(userId: string, socketId: string): boolean {
-    const sockets = this.onlineUsers.get(userId);
-    if (!sockets) {
-      return false;
-    }
-
-    sockets.delete(socketId);
-    if (sockets.size === 0) {
-      this.onlineUsers.delete(userId);
-      return true;
-    }
-    return false;
-  }
-
-  isOnline(userId: string): boolean {
-    return this.onlineUsers.has(userId);
-  }
-
-  getOnlineUserIds(): string[] {
-    return Array.from(this.onlineUsers.keys());
+  authorizePresenceChannel(
+    socketId: string,
+    channelName: string,
+    userId: string,
+    userInfo: Record<string, unknown>,
+  ) {
+    return this.pusher.authorizeChannel(socketId, channelName, {
+      user_id: userId,
+      user_info: userInfo,
+    });
   }
 }
