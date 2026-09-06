@@ -25,7 +25,10 @@ export type JobApplicationDocument = HydratedDocument<JobApplication>;
 @Schema({ timestamps: true, versionKey: false })
 export class JobApplication {
   @Prop({ type: Types.ObjectId, ref: JobPost.name, required: true })
-  jobPost!: Types.ObjectId;
+  jobPostId!: Types.ObjectId;
+
+  @Prop({ required: true })
+  fileName!: string;
 
   @Prop({ type: Types.ObjectId, ref: Resume.name, default: null })
   resumeId!: Types.ObjectId | null;
