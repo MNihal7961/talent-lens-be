@@ -8,6 +8,9 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PresenceModule } from './presence/presence.module';
 import { JobPostModule } from './job-post/job-post.module';
+import { ResumeModule } from './resume/resume.module';
+import { JobApplicationModule } from './job-application/job-application.module';
+import { ScreeningModule } from './screening/screening.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { JobPostModule } from './job-post/job-post.module';
     UserModule,
     PresenceModule,
     JobPostModule,
+    ResumeModule,
+    JobApplicationModule,
+    ScreeningModule,
   ],
   controllers: [AppController],
   providers: [AppService],
