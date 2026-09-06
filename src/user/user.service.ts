@@ -18,11 +18,11 @@ export class UserService {
     if (!isValidObjectId(id)) {
       return null;
     }
-    return this.userModel.findById(id).select('-password').exec();
+    return await this.userModel.findById(id).select('-password').exec();
   }
 
-  getUserByEmail(email: string) {
-    return this.userModel.findOne({ email }).exec();
+  async getUserByEmail(email: string) {
+    return await this.userModel.findOne({ email }).exec();
   }
 
   async createUser(createUserDto: CreateUserDTO) {
