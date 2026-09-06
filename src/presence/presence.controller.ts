@@ -2,7 +2,10 @@ import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser, JwtPayload } from '../decorators/current-user.decorator';
 import { PresenceAuthDTO } from '../types';
-import { PresenceService } from './presence.service';
+import {
+  PRIVATE_USER_CHANNEL_PREFIX,
+  PresenceService,
+} from './presence.service';
 
 export const ONLINE_USERS_CHANNEL = 'presence-online-users';
 
@@ -13,21 +16,28 @@ export class PresenceController {
 
   @Post('auth')
   @ApiOperation({
-    summary: 'Authorize a Pusher presence-channel subscription',
+    summary: 'Authorize a Pusher presence/private-channel subscription',
   })
   authorizeChannel(
     @Body() body: PresenceAuthDTO,
     @CurrentUser() user: JwtPayload,
   ) {
-    if (body.channel_name !== ONLINE_USERS_CHANNEL) {
-      throw new BadRequestException('Unknown presence channel');
+    if (body.channel_name === ONLINE_USERS_CHANNEL) {
+      return this.presenceService.authorizePresenceChannel(
+        body.socket_id,
+        body.channel_name,
+        user._id,
+        { email: user.email },
+      );
     }
 
-    return this.presenceService.authorizePresenceChannel(
-      body.socket_id,
-      body.channel_name,
-      user._id,
-      { email: user.email },
-    );
+    if (body.channel_name === `${PRIVATE_USER_CHANNEL_PREFIX}${user._id}`) {
+      return this.presenceService.authorizePrivateChannel(
+        body.socket_id,
+        body.channel_name,
+      );
+    }
+
+    throw new BadRequestException('Unknown presence channel');
   }
 }

@@ -4,16 +4,30 @@ import {
   IsArray,
   IsBoolean,
   IsEmail,
+  IsEnum,
   IsInt,
   IsNotEmpty,
   IsString,
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { JobApplicationStatus } from '../job-application/job-application.model';
 import { UserRole } from '../user/user.model';
 
+export class UpdateJobApplicationStatusDTO {
+  @ApiProperty({
+    enum: JobApplicationStatus,
+    example: JobApplicationStatus.SHORTLISTED,
+  })
+  @IsEnum(JobApplicationStatus)
+  status!: JobApplicationStatus;
+}
+
 export class PresenceAuthDTO {
-  @ApiProperty({ example: '123.456', description: 'Pusher connection socket id' })
+  @ApiProperty({
+    example: '123.456',
+    description: 'Pusher connection socket id',
+  })
   @IsString()
   socket_id!: string;
 
