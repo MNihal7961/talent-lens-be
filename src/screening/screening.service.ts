@@ -114,6 +114,12 @@ export class ScreeningService {
         jobApplicationId,
       );
       jobApplication.resumeId = savedResume._id;
+      jobApplication.candidateName = [
+        parsedResume.user.firstName,
+        parsedResume.user.lastName,
+      ]
+        .filter(Boolean)
+        .join(' ');
       await jobApplication.save();
 
       this.eventEmitter.emit(
