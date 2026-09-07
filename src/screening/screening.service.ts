@@ -91,9 +91,7 @@ export class ScreeningService {
   }
 
   private normalizeRequirementStatus(status: string): RequirementStatus {
-    if (
-      (Object.values(RequirementStatus) as string[]).includes(status)
-    ) {
+    if ((Object.values(RequirementStatus) as string[]).includes(status)) {
       return status as RequirementStatus;
     }
 
