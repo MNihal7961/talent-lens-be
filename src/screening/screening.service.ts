@@ -14,6 +14,7 @@ import { ScreeningStatus } from '../job-application/job-application.model';
 import { JobApplicationService } from '../job-application/job-application.service';
 import { ResumeService } from '../resume/resume.service';
 import {
+  RequirementStatus,
   ScreeningResult,
   ScreeningResultDocument,
 } from './screening-result.model';
@@ -81,8 +82,25 @@ export class ScreeningService {
   ) {
     return await this.screeningResultModel.create({
       ...result,
+      requirements: result.requirements.map((requirement) => ({
+        ...requirement,
+        status: this.normalizeRequirementStatus(requirement.status),
+      })),
       jobApplicationId,
     });
+  }
+
+  private normalizeRequirementStatus(status: string): RequirementStatus {
+    if (
+      (Object.values(RequirementStatus) as string[]).includes(status)
+    ) {
+      return status as RequirementStatus;
+    }
+
+    this.logger.warn(
+      `n8n returned an unexpected requirement status "${status}"; falling back to UNCERTAIN`,
+    );
+    return RequirementStatus.UNCERTAIN;
   }
 
   async getScreeningResultByJobApplicationId(jobApplicationId: string) {
