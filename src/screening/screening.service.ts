@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { waitUntil } from '@vercel/functions';
 import {
   RESUME_SAVED_EVENT,
   ResumeSavedEvent,
@@ -57,10 +58,19 @@ export class ScreeningService {
         resume.originalname,
       );
 
-    this.eventEmitter.emit(
+    // The full parse -> match -> notify pipeline runs after this handler
+    // returns. On Vercel, the function can freeze as soon as the response is
+    // sent, silently killing any still-pending fire-and-forget work — so we
+    // chain the whole pipeline into one promise (via emitAsync, both here and
+    // in every event handler/status update it triggers) and hand it to
+    // waitUntil, which keeps the function alive until that promise settles.
+    // waitUntil is a no-op outside the Vercel request context (e.g. locally),
+    // where the persistent process already lets this finish on its own.
+    const backgroundScreening = this.eventEmitter.emitAsync(
       START_SCREENING_EVENT,
       new StartScreeningEvent(String(jobApplication._id), resume),
     );
+    waitUntil(backgroundScreening);
 
     return jobApplication;
   }
@@ -122,7 +132,11 @@ export class ScreeningService {
         .join(' ');
       await jobApplication.save();
 
-      this.eventEmitter.emit(
+      // Awaited (via emitAsync, not a fire-and-forget emit) so this handler's
+      // own returned promise — which screenResume() hands to waitUntil —
+      // doesn't resolve until the rest of the pipeline (handleResumeSavedEvent)
+      // finishes too.
+      await this.eventEmitter.emitAsync(
         RESUME_SAVED_EVENT,
         new ResumeSavedEvent(savedResume, jobApplication.jobPostId.toString()),
       );

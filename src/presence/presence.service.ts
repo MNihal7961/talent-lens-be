@@ -47,7 +47,10 @@ export class PresenceService {
   handleScreeningStatusUpdated({
     updatedJobApplication,
   }: JobApplicationScreeningStatusUpdatedEvent) {
-    void this.notifyUser(
+    // Returned (not voided) so emitAsync callers actually wait for delivery —
+    // otherwise this fire-and-forget trigger can get killed mid-flight when a
+    // Vercel serverless function freezes right after its tracked work resolves.
+    return this.notifyUser(
       String(updatedJobApplication.createdBy),
       'job-application:screening-status-updated',
       {
@@ -61,7 +64,7 @@ export class PresenceService {
   handleApplicationStatusUpdated({
     updatedJobApplication,
   }: JobApplicationStatusUpdatedEvent) {
-    void this.notifyUser(
+    return this.notifyUser(
       String(updatedJobApplication.createdBy),
       'job-application:status-updated',
       {

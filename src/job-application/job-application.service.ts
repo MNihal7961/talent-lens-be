@@ -48,7 +48,11 @@ export class JobApplicationService {
       .exec();
 
     if (updatedJobApplication) {
-      this.eventEmitter.emit(
+      // emitAsync (not emit) so callers that await this method also wait for
+      // the Pusher notification to finish — required on Vercel, where the
+      // serverless function can freeze as soon as its tracked promise chain
+      // resolves, silently dropping any still-pending fire-and-forget work.
+      await this.eventEmitter.emitAsync(
         JoB_APPLICATION_SCREENING_STATUS_UPDATED_EVENT,
         new JobApplicationScreeningStatusUpdatedEvent(updatedJobApplication),
       );
@@ -70,7 +74,7 @@ export class JobApplicationService {
       .exec();
 
     if (updatedJobApplication) {
-      this.eventEmitter.emit(
+      await this.eventEmitter.emitAsync(
         JoB_APPLICATION_STATUS_UPDATED_EVENT,
         new JobApplicationStatusUpdatedEvent(updatedJobApplication),
       );
