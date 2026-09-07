@@ -61,6 +61,10 @@ export class JobPostService {
       .exec();
   }
 
+  async countByUserId(userId: string) {
+    return await this.jobPostModel.countDocuments({ createdBy: userId }).exec();
+  }
+
   async save(jobPost: GeneratedJobPost, userId: string) {
     return await this.jobPostModel.create({
       ...jobPost,
