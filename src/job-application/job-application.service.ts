@@ -100,4 +100,24 @@ export class JobApplicationService {
   async findApplicationByResumeId(resumeId: string) {
     return await this.jobApplicationModel.findOne({ resumeId }).exec();
   }
+
+  async getStatisticsByUserId(userId: string) {
+    const [total, shortlisted, rejected] = await Promise.all([
+      this.jobApplicationModel.countDocuments({ createdBy: userId }).exec(),
+      this.jobApplicationModel
+        .countDocuments({
+          createdBy: userId,
+          status: JobApplicationStatus.SHORTLISTED,
+        })
+        .exec(),
+      this.jobApplicationModel
+        .countDocuments({
+          createdBy: userId,
+          status: JobApplicationStatus.REJECTED,
+        })
+        .exec(),
+    ]);
+
+    return { total, shortlisted, rejected };
+  }
 }
