@@ -2,7 +2,8 @@ import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { v2 as cloudinary } from 'cloudinary';
-import { Model } from 'mongoose';
+import { randomBytes } from 'crypto';
+import { Model, isValidObjectId } from 'mongoose';
 import { Resume, ResumeDocument } from './resume.model';
 
 const RESUME_PARSE_WEBHOOK_PATH = '/webhook/resume/parse';
@@ -35,6 +36,13 @@ export class ResumeService {
     @InjectModel(Resume.name)
     private readonly resumeModel: Model<ResumeDocument>,
   ) {}
+
+  async findById(id: string) {
+    if (!isValidObjectId(id)) {
+      return null;
+    }
+    return await this.resumeModel.findById(id).exec();
+  }
 
   async parseResume(resume: Express.Multer.File): Promise<ParsedResume> {
     const n8nBaseUrl = this.configService.getOrThrow<string>('N8N_BASE_URL');
@@ -101,9 +109,10 @@ export class ResumeService {
       const dataUri = `data:${resume.mimetype};base64,${resume.buffer.toString('base64')}`;
       const uploadResult = await cloudinary.uploader.upload(dataUri, {
         folder: CLOUDINARY_RESUME_FOLDER,
-        resource_type: 'auto',
+        resource_type: 'raw',
         use_filename: true,
-        filename_override: resume.originalname,
+        unique_filename: false,
+        filename_override: this.buildUniqueFileName(resume.originalname),
       });
       return uploadResult.secure_url;
     } catch (error) {
@@ -112,6 +121,19 @@ export class ResumeService {
       );
       throw new BadGatewayException('Failed to upload resume file');
     }
+  }
+
+  private buildUniqueFileName(originalName: string): string {
+    const randomSuffix = randomBytes(3).toString('hex').slice(0, 5);
+    const lastDotIndex = originalName.lastIndexOf('.');
+
+    if (lastDotIndex <= 0) {
+      return `${originalName}_${randomSuffix}`;
+    }
+
+    const baseName = originalName.slice(0, lastDotIndex);
+    const extension = originalName.slice(lastDotIndex);
+    return `${baseName}_${randomSuffix}${extension}`;
   }
 
   private stringifyError(error: unknown): string {
