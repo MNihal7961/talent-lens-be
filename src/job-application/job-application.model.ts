@@ -30,6 +30,9 @@ export class JobApplication {
   @Prop({ required: true })
   fileName!: string;
 
+  @Prop({ type: String, default: null })
+  candidateName!: string | null;
+
   @Prop({ type: Types.ObjectId, ref: Resume.name, default: null })
   resumeId!: Types.ObjectId | null;
 
